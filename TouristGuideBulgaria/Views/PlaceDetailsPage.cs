@@ -13,17 +13,27 @@ namespace TouristGuideBulgaria.Views
 
             Title = place.Name;
 
+            var image = new Image
+            {
+                Source = place.ImageUrl,
+                HeightRequest = 220,
+                Aspect = Aspect.AspectFill,
+                BackgroundColor = Colors.LightGray
+            };
+
             var nameLabel = new Label
             {
                 Text = place.Name,
-                FontSize = 26,
-                FontAttributes = FontAttributes.Bold
+                FontSize = 28,
+                FontAttributes = FontAttributes.Bold,
+                TextColor = Colors.Black
             };
 
             var categoryLabel = new Label
             {
                 Text = $"Категория: {place.Category}",
                 FontSize = 15,
+                FontAttributes = FontAttributes.Bold,
                 TextColor = Colors.DarkGreen
             };
 
@@ -37,14 +47,16 @@ namespace TouristGuideBulgaria.Views
             var descriptionLabel = new Label
             {
                 Text = place.Description,
-                FontSize = 16
+                FontSize = 16,
+                LineBreakMode = LineBreakMode.WordWrap
             };
 
             var factLabel = new Label
             {
                 Text = $"Интересен факт: {place.InterestingFact}",
                 FontSize = 15,
-                FontAttributes = FontAttributes.Italic
+                FontAttributes = FontAttributes.Italic,
+                TextColor = Colors.DarkSlateGray
             };
 
             var coordinatesLabel = new Label
@@ -54,12 +66,14 @@ namespace TouristGuideBulgaria.Views
                 TextColor = Colors.Gray
             };
 
-            // ⭐ Бутон за любими
             var favoriteButton = new Button
             {
                 Text = FavoritesService.IsFavorite(_place.Id)
                     ? "Премахни от любими"
-                    : "Добави в любими"
+                    : "Добави в любими",
+                CornerRadius = 10,
+                BackgroundColor = Colors.MediumPurple,
+                TextColor = Colors.White
             };
 
             favoriteButton.Clicked += async (sender, e) =>
@@ -78,10 +92,12 @@ namespace TouristGuideBulgaria.Views
                 }
             };
 
-            // 🗺️ Google Maps бутон
             var mapsButton = new Button
             {
-                Text = "Отвори в Google Maps"
+                Text = "Отвори в Google Maps",
+                CornerRadius = 10,
+                BackgroundColor = Colors.MediumPurple,
+                TextColor = Colors.White
             };
 
             mapsButton.Clicked += async (sender, e) =>
@@ -96,18 +112,27 @@ namespace TouristGuideBulgaria.Views
             {
                 Content = new VerticalStackLayout
                 {
-                    Padding = 20,
-                    Spacing = 12,
+                    Spacing = 14,
                     Children =
                     {
-                        nameLabel,
-                        categoryLabel,
-                        regionLabel,
-                        descriptionLabel,
-                        factLabel,
-                        coordinatesLabel,
-                        favoriteButton,
-                        mapsButton
+                        image,
+
+                        new VerticalStackLayout
+                        {
+                            Padding = new Thickness(20, 5, 20, 20),
+                            Spacing = 12,
+                            Children =
+                            {
+                                nameLabel,
+                                categoryLabel,
+                                regionLabel,
+                                descriptionLabel,
+                                factLabel,
+                                coordinatesLabel,
+                                favoriteButton,
+                                mapsButton
+                            }
+                        }
                     }
                 }
             };

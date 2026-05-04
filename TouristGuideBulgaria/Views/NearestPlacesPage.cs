@@ -16,7 +16,11 @@ namespace TouristGuideBulgaria.Views
 
             public string Region => Place.Region;
 
-            public string DistanceText { get; set; } = string.Empty;
+            public string ImageUrl => Place.ImageUrl;
+
+            public double Distance { get; set; }
+
+            public string DistanceText => $"{Distance:F1} км от вас";
         }
 
         public NearestPlacesPage(Location userLocation)
@@ -29,13 +33,13 @@ namespace TouristGuideBulgaria.Views
                 .Select(p => new NearestPlaceItem
                 {
                     Place = p,
-                    DistanceText = $"{CalculateDistance(
+                    Distance = CalculateDistance(
                         userLocation.Latitude,
                         userLocation.Longitude,
                         p.Latitude,
-                        p.Longitude):F1} км от вас"
+                        p.Longitude)
                 })
-                .OrderBy(p => double.Parse(p.DistanceText.Split(' ')[0]))
+                .OrderBy(p => p.Distance)
                 .Take(5)
                 .ToList();
 
@@ -45,16 +49,26 @@ namespace TouristGuideBulgaria.Views
                 SelectionMode = SelectionMode.None,
                 ItemTemplate = new DataTemplate(() =>
                 {
+                    var image = new Image
+                    {
+                        HeightRequest = 170,
+                        Aspect = Aspect.AspectFill,
+                        BackgroundColor = Colors.LightGray
+                    };
+                    image.SetBinding(Image.SourceProperty, nameof(NearestPlaceItem.ImageUrl));
+
                     var nameLabel = new Label
                     {
-                        FontSize = 20,
-                        FontAttributes = FontAttributes.Bold
+                        FontSize = 21,
+                        FontAttributes = FontAttributes.Bold,
+                        TextColor = Colors.Black
                     };
                     nameLabel.SetBinding(Label.TextProperty, nameof(NearestPlaceItem.Name));
 
                     var categoryLabel = new Label
                     {
                         FontSize = 14,
+                        FontAttributes = FontAttributes.Bold,
                         TextColor = Colors.DarkGreen
                     };
                     categoryLabel.SetBinding(Label.TextProperty, nameof(NearestPlaceItem.Category));
@@ -70,13 +84,16 @@ namespace TouristGuideBulgaria.Views
                     {
                         FontSize = 15,
                         FontAttributes = FontAttributes.Bold,
-                        TextColor = Colors.DarkBlue
+                        TextColor = Colors.DarkSlateBlue
                     };
                     distanceLabel.SetBinding(Label.TextProperty, nameof(NearestPlaceItem.DistanceText));
 
                     var detailsButton = new Button
                     {
-                        Text = "Детайли"
+                        Text = "Детайли",
+                        BackgroundColor = Colors.MediumPurple,
+                        TextColor = Colors.White,
+                        CornerRadius = 10
                     };
 
                     detailsButton.SetBinding(Button.CommandParameterProperty, ".");
@@ -91,39 +108,60 @@ namespace TouristGuideBulgaria.Views
 
                     return new Frame
                     {
-                        Margin = new Thickness(0, 0, 0, 12),
-                        Padding = 12,
-                        CornerRadius = 12,
+                        Margin = new Thickness(0, 0, 0, 14),
+                        Padding = 0,
+                        CornerRadius = 14,
                         BorderColor = Colors.LightGray,
+                        BackgroundColor = Colors.White,
+                        HasShadow = true,
                         Content = new VerticalStackLayout
                         {
-                            Spacing = 5,
+                            Spacing = 10,
                             Children =
                             {
-                                nameLabel,
-                                categoryLabel,
-                                regionLabel,
-                                distanceLabel,
-                                detailsButton
+                                image,
+                                new VerticalStackLayout
+                                {
+                                    Padding = new Thickness(14, 0, 14, 14),
+                                    Spacing = 6,
+                                    Children =
+                                    {
+                                        nameLabel,
+                                        categoryLabel,
+                                        regionLabel,
+                                        distanceLabel,
+                                        detailsButton
+                                    }
+                                }
                             }
                         }
                     };
                 })
             };
 
-            Content = new VerticalStackLayout
+            Content = new ScrollView
             {
-                Padding = 15,
-                Spacing = 10,
-                Children =
+                Content = new VerticalStackLayout
                 {
-                    new Label
+                    Padding = 16,
+                    Spacing = 16,
+                    Children =
                     {
-                        Text = "Най-близките 5 обекта",
-                        FontSize = 24,
-                        FontAttributes = FontAttributes.Bold
-                    },
-                    collectionView
+                        new Label
+                        {
+                            Text = "Най-близките 5 обекта",
+                            FontSize = 26,
+                            FontAttributes = FontAttributes.Bold,
+                            TextColor = Colors.Black
+                        },
+                        new Label
+                        {
+                            Text = "Списъкът е изчислен спрямо текущата GPS локация на устройството.",
+                            FontSize = 15,
+                            TextColor = Colors.Gray
+                        },
+                        collectionView
+                    }
                 }
             };
         }

@@ -11,18 +11,21 @@ namespace TouristGuideBulgaria
 
         public MainPage()
         {
+            Title = "Начало";
+
             var places = PlaceData.GetPlaces();
 
             _favoritesCountLabel = new Label
             {
                 FontSize = 14,
-                TextColor = Colors.DarkBlue
+                TextColor = Colors.DarkSlateGray,
+                FontAttributes = FontAttributes.Bold
             };
 
             var favoritesButton = new Button
             {
                 Text = "Любими обекти",
-                BackgroundColor = Colors.LightBlue,
+                BackgroundColor = Colors.MediumPurple,
                 TextColor = Colors.White,
                 CornerRadius = 10
             };
@@ -35,7 +38,7 @@ namespace TouristGuideBulgaria
             var locationButton = new Button
             {
                 Text = "Моята локация",
-                BackgroundColor = Colors.LightBlue,
+                BackgroundColor = Colors.MediumPurple,
                 TextColor = Colors.White,
                 CornerRadius = 10
             };
@@ -51,16 +54,26 @@ namespace TouristGuideBulgaria
                 SelectionMode = SelectionMode.None,
                 ItemTemplate = new DataTemplate(() =>
                 {
+                    var image = new Image
+                    {
+                        HeightRequest = 170,
+                        Aspect = Aspect.AspectFill,
+                        BackgroundColor = Colors.LightGray
+                    };
+                    image.SetBinding(Image.SourceProperty, nameof(Place.ImageUrl));
+
                     var nameLabel = new Label
                     {
-                        FontSize = 20,
-                        FontAttributes = FontAttributes.Bold
+                        FontSize = 21,
+                        FontAttributes = FontAttributes.Bold,
+                        TextColor = Colors.Black
                     };
                     nameLabel.SetBinding(Label.TextProperty, nameof(Place.Name));
 
                     var categoryLabel = new Label
                     {
                         FontSize = 14,
+                        FontAttributes = FontAttributes.Bold,
                         TextColor = Colors.DarkGreen
                     };
                     categoryLabel.SetBinding(Label.TextProperty, nameof(Place.Category));
@@ -74,16 +87,17 @@ namespace TouristGuideBulgaria
 
                     var descriptionLabel = new Label
                     {
-                        FontSize = 14
+                        FontSize = 14,
+                        TextColor = Colors.DarkSlateGray
                     };
                     descriptionLabel.SetBinding(Label.TextProperty, nameof(Place.ShortDescription));
 
                     var detailsButton = new Button
                     {
                         Text = "Детайли",
-                        BackgroundColor = Colors.LightGray,
-                        TextColor = Colors.Black,
-                        CornerRadius = 8
+                        BackgroundColor = Colors.MediumPurple,
+                        TextColor = Colors.White,
+                        CornerRadius = 10
                     };
 
                     detailsButton.SetBinding(Button.CommandParameterProperty, ".");
@@ -97,20 +111,31 @@ namespace TouristGuideBulgaria
 
                     return new Frame
                     {
-                        Margin = new Thickness(0, 0, 0, 12),
-                        Padding = 12,
-                        CornerRadius = 12,
+                        Margin = new Thickness(0, 0, 0, 14),
+                        Padding = 0,
+                        CornerRadius = 14,
                         BorderColor = Colors.LightGray,
+                        BackgroundColor = Colors.White,
+                        HasShadow = true,
                         Content = new VerticalStackLayout
                         {
-                            Spacing = 5,
+                            Spacing = 10,
                             Children =
                             {
-                                nameLabel,
-                                categoryLabel,
-                                regionLabel,
-                                descriptionLabel,
-                                detailsButton
+                                image,
+                                new VerticalStackLayout
+                                {
+                                    Padding = new Thickness(14, 0, 14, 14),
+                                    Spacing = 6,
+                                    Children =
+                                    {
+                                        nameLabel,
+                                        categoryLabel,
+                                        regionLabel,
+                                        descriptionLabel,
+                                        detailsButton
+                                    }
+                                }
                             }
                         }
                     };
@@ -121,20 +146,21 @@ namespace TouristGuideBulgaria
             {
                 Content = new VerticalStackLayout
                 {
-                    Padding = 15,
-                    Spacing = 15,
+                    Padding = 16,
+                    Spacing = 16,
                     Children =
                     {
                         new Label
                         {
                             Text = "100 национални туристически обекта",
-                            FontSize = 24,
-                            FontAttributes = FontAttributes.Bold
+                            FontSize = 26,
+                            FontAttributes = FontAttributes.Bold,
+                            TextColor = Colors.Black
                         },
                         new Label
                         {
                             Text = "Открий, запази и посети забележителностите на България",
-                            FontSize = 14,
+                            FontSize = 15,
                             TextColor = Colors.Gray
                         },
                         _favoritesCountLabel,

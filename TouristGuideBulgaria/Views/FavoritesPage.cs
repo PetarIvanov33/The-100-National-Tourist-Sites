@@ -16,16 +16,26 @@ namespace TouristGuideBulgaria.Views
                 SelectionMode = SelectionMode.None,
                 ItemTemplate = new DataTemplate(() =>
                 {
+                    var image = new Image
+                    {
+                        HeightRequest = 170,
+                        Aspect = Aspect.AspectFill,
+                        BackgroundColor = Colors.LightGray
+                    };
+                    image.SetBinding(Image.SourceProperty, nameof(Place.ImageUrl));
+
                     var nameLabel = new Label
                     {
-                        FontSize = 20,
-                        FontAttributes = FontAttributes.Bold
+                        FontSize = 21,
+                        FontAttributes = FontAttributes.Bold,
+                        TextColor = Colors.Black
                     };
                     nameLabel.SetBinding(Label.TextProperty, nameof(Place.Name));
 
                     var categoryLabel = new Label
                     {
                         FontSize = 14,
+                        FontAttributes = FontAttributes.Bold,
                         TextColor = Colors.DarkGreen
                     };
                     categoryLabel.SetBinding(Label.TextProperty, nameof(Place.Category));
@@ -39,7 +49,10 @@ namespace TouristGuideBulgaria.Views
 
                     var detailsButton = new Button
                     {
-                        Text = "Детайли"
+                        Text = "Детайли",
+                        BackgroundColor = Colors.MediumPurple,
+                        TextColor = Colors.White,
+                        CornerRadius = 10
                     };
 
                     detailsButton.SetBinding(Button.CommandParameterProperty, ".");
@@ -54,19 +67,30 @@ namespace TouristGuideBulgaria.Views
 
                     return new Frame
                     {
-                        Margin = new Thickness(0, 0, 0, 12),
-                        Padding = 12,
-                        CornerRadius = 12,
+                        Margin = new Thickness(0, 0, 0, 14),
+                        Padding = 0,
+                        CornerRadius = 14,
                         BorderColor = Colors.LightGray,
+                        BackgroundColor = Colors.White,
+                        HasShadow = true,
                         Content = new VerticalStackLayout
                         {
-                            Spacing = 5,
+                            Spacing = 10,
                             Children =
                             {
-                                nameLabel,
-                                categoryLabel,
-                                regionLabel,
-                                detailsButton
+                                image,
+                                new VerticalStackLayout
+                                {
+                                    Padding = new Thickness(14, 0, 14, 14),
+                                    Spacing = 6,
+                                    Children =
+                                    {
+                                        nameLabel,
+                                        categoryLabel,
+                                        regionLabel,
+                                        detailsButton
+                                    }
+                                }
                             }
                         }
                     };
@@ -77,15 +101,22 @@ namespace TouristGuideBulgaria.Views
             {
                 Content = new VerticalStackLayout
                 {
-                    Padding = 15,
-                    Spacing = 10,
+                    Padding = 16,
+                    Spacing = 16,
                     Children =
                     {
                         new Label
                         {
                             Text = "Любими обекти",
-                            FontSize = 24,
-                            FontAttributes = FontAttributes.Bold
+                            FontSize = 26,
+                            FontAttributes = FontAttributes.Bold,
+                            TextColor = Colors.Black
+                        },
+                        new Label
+                        {
+                            Text = "Тук се показват всички запазени от теб туристически обекти.",
+                            FontSize = 15,
+                            TextColor = Colors.Gray
                         },
                         _collectionView
                     }
@@ -97,7 +128,6 @@ namespace TouristGuideBulgaria.Views
         {
             base.OnAppearing();
 
-            // 🔥 това е ключът – обновява списъка всеки път
             _collectionView.ItemsSource = null;
             _collectionView.ItemsSource = FavoritesService.GetFavorites();
         }

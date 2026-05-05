@@ -3,18 +3,18 @@ using TouristGuideBulgaria.Services;
 
 namespace TouristGuideBulgaria.Views
 {
-    public class FavoritesPage : ContentPage
+    public class VisitedPage : ContentPage
     {
         private readonly CollectionView _collectionView;
         private readonly Label _emptyLabel;
 
-        public FavoritesPage()
+        public VisitedPage()
         {
-            Title = "Любими";
+            Title = "Посетени";
 
             _emptyLabel = new Label
             {
-                Text = "Все още няма добавени любими обекти.",
+                Text = "Все още няма посетени обекти.",
                 FontSize = 16,
                 TextColor = Colors.Gray,
                 HorizontalTextAlignment = TextAlignment.Center,
@@ -60,7 +60,7 @@ namespace TouristGuideBulgaria.Views
                     var detailsButton = new Button
                     {
                         Text = "Детайли",
-                        BackgroundColor = Colors.MediumPurple,
+                        BackgroundColor = Colors.SeaGreen,
                         TextColor = Colors.White,
                         CornerRadius = 10
                     };
@@ -117,14 +117,14 @@ namespace TouristGuideBulgaria.Views
                     {
                         new Label
                         {
-                            Text = "Любими обекти",
+                            Text = "Посетени обекти",
                             FontSize = 26,
                             FontAttributes = FontAttributes.Bold,
                             TextColor = Colors.Black
                         },
                         new Label
                         {
-                            Text = "Тук се показват всички запазени от теб туристически обекти.",
+                            Text = "Тук се показват всички обекти, които си посетил.",
                             FontSize = 15,
                             TextColor = Colors.Gray
                         },
@@ -139,13 +139,13 @@ namespace TouristGuideBulgaria.Views
         {
             base.OnAppearing();
 
-            var favorites = FavoritesService.GetFavorites();
+            var visited = VisitedService.GetVisitedPlaces();
 
             _collectionView.ItemsSource = null;
-            _collectionView.ItemsSource = favorites;
+            _collectionView.ItemsSource = visited;
 
-            _emptyLabel.IsVisible = favorites.Count == 0;
-            _collectionView.IsVisible = favorites.Count > 0;
+            _emptyLabel.IsVisible = visited.Count == 0;
+            _collectionView.IsVisible = visited.Count > 0;
         }
     }
 }

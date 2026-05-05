@@ -10,6 +10,7 @@ namespace TouristGuideBulgaria
         private Label _favoritesCountLabel;
         private Label _visitedCountLabel;
         private Label _progressLabel;
+        private CollectionView _collectionView;
 
         public MainPage()
         {
@@ -51,6 +52,19 @@ namespace TouristGuideBulgaria
                 await Navigation.PushAsync(new FavoritesPage());
             };
 
+            var visitedButton = new Button
+            {
+                Text = "Посетени обекти",
+                BackgroundColor = Colors.SeaGreen,
+                TextColor = Colors.White,
+                CornerRadius = 10
+            };
+
+            visitedButton.Clicked += async (sender, e) =>
+            {
+                await Navigation.PushAsync(new VisitedPage());
+            };
+
             var locationButton = new Button
             {
                 Text = "Моята локация",
@@ -64,7 +78,39 @@ namespace TouristGuideBulgaria
                 await Navigation.PushAsync(new LocationPage());
             };
 
-            var collectionView = new CollectionView
+            var randomButton = new Button
+            {
+                Text = "Избери непосетен обект",
+                BackgroundColor = Colors.SeaGreen,
+                TextColor = Colors.White,
+                CornerRadius = 10
+            };
+
+            randomButton.Clicked += async (sender, e) =>
+            {
+                var allPlaces = PlaceData.GetPlaces();
+
+                var unvisitedPlaces = allPlaces
+                    .Where(p => !VisitedService.IsVisited(p.Id))
+                    .ToList();
+
+                if (unvisitedPlaces.Count == 0)
+                {
+                    await DisplayAlert(
+                        "Браво!",
+                        "Всички обекти са маркирани като посетени.",
+                        "OK");
+
+                    return;
+                }
+
+                var random = new Random();
+                var selectedPlace = unvisitedPlaces[random.Next(unvisitedPlaces.Count)];
+
+                await Navigation.PushAsync(new PlaceDetailsPage(selectedPlace));
+            };
+
+            _collectionView = new CollectionView
             {
                 ItemsSource = places,
                 SelectionMode = SelectionMode.None,
@@ -77,6 +123,33 @@ namespace TouristGuideBulgaria
                         BackgroundColor = Colors.LightGray
                     };
                     image.SetBinding(Image.SourceProperty, nameof(Place.ImageUrl));
+
+                    var statusLabel = new Label
+                    {
+                        FontSize = 14,
+                        FontAttributes = FontAttributes.Bold,
+                        TextColor = Colors.DarkSlateGray
+                    };
+
+                    statusLabel.BindingContextChanged += (sender, e) =>
+                    {
+                        if (statusLabel.BindingContext is Place place)
+                        {
+                            var statuses = new List<string>();
+
+                            if (FavoritesService.IsFavorite(place.Id))
+                                statuses.Add("⭐ Любим");
+
+                            if (VisitedService.IsVisited(place.Id))
+                                statuses.Add("✔️ Посетен");
+
+                            statusLabel.Text = statuses.Count > 0
+                                ? string.Join("   ", statuses)
+                                : string.Empty;
+
+                            statusLabel.IsVisible = statuses.Count > 0;
+                        }
+                    };
 
                     var nameLabel = new Label
                     {
@@ -145,6 +218,7 @@ namespace TouristGuideBulgaria
                                     Spacing = 6,
                                     Children =
                                     {
+                                        statusLabel,
                                         nameLabel,
                                         categoryLabel,
                                         regionLabel,
@@ -200,8 +274,10 @@ namespace TouristGuideBulgaria
                         },
                         statsFrame,
                         favoritesButton,
+                        visitedButton,
                         locationButton,
-                        collectionView
+                        randomButton,
+                        _collectionView
                     }
                 }
             };
@@ -224,6 +300,9 @@ namespace TouristGuideBulgaria
 
             _progressLabel.Text =
                 $"Прогрес: {progress}%";
+
+            _collectionView.ItemsSource = null;
+            _collectionView.ItemsSource = PlaceData.GetPlaces();
         }
     }
 }

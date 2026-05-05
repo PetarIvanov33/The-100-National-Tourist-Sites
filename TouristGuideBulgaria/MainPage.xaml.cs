@@ -8,6 +8,8 @@ namespace TouristGuideBulgaria
     public partial class MainPage : ContentPage
     {
         private Label _favoritesCountLabel;
+        private Label _visitedCountLabel;
+        private Label _progressLabel;
 
         public MainPage()
         {
@@ -19,6 +21,20 @@ namespace TouristGuideBulgaria
             {
                 FontSize = 14,
                 TextColor = Colors.DarkSlateGray,
+                FontAttributes = FontAttributes.Bold
+            };
+
+            _visitedCountLabel = new Label
+            {
+                FontSize = 14,
+                TextColor = Colors.DarkSlateGray,
+                FontAttributes = FontAttributes.Bold
+            };
+
+            _progressLabel = new Label
+            {
+                FontSize = 14,
+                TextColor = Colors.DarkGreen,
                 FontAttributes = FontAttributes.Bold
             };
 
@@ -142,6 +158,25 @@ namespace TouristGuideBulgaria
                 })
             };
 
+            var statsFrame = new Frame
+            {
+                Padding = 14,
+                CornerRadius = 14,
+                BorderColor = Colors.LightGray,
+                BackgroundColor = Colors.White,
+                HasShadow = true,
+                Content = new VerticalStackLayout
+                {
+                    Spacing = 5,
+                    Children =
+                    {
+                        _favoritesCountLabel,
+                        _visitedCountLabel,
+                        _progressLabel
+                    }
+                }
+            };
+
             Content = new ScrollView
             {
                 Content = new VerticalStackLayout
@@ -163,7 +198,7 @@ namespace TouristGuideBulgaria
                             FontSize = 15,
                             TextColor = Colors.Gray
                         },
-                        _favoritesCountLabel,
+                        statsFrame,
                         favoritesButton,
                         locationButton,
                         collectionView
@@ -176,8 +211,19 @@ namespace TouristGuideBulgaria
         {
             base.OnAppearing();
 
+            var totalPlaces = PlaceData.GetPlaces().Count;
+            var visitedCount = VisitedService.GetVisitedPlaces().Count;
+
             _favoritesCountLabel.Text =
                 $"Любими: {FavoritesService.GetFavorites().Count}";
+
+            _visitedCountLabel.Text =
+                $"Посетени: {visitedCount} / {totalPlaces}";
+
+            var progress = totalPlaces == 0 ? 0 : (visitedCount * 100) / totalPlaces;
+
+            _progressLabel.Text =
+                $"Прогрес: {progress}%";
         }
     }
 }

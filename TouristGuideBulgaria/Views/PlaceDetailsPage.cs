@@ -66,6 +66,7 @@ namespace TouristGuideBulgaria.Views
                 TextColor = Colors.Gray
             };
 
+            // ⭐ Любими
             var favoriteButton = new Button
             {
                 Text = FavoritesService.IsFavorite(_place.Id)
@@ -92,6 +93,34 @@ namespace TouristGuideBulgaria.Views
                 }
             };
 
+            // ✔️ Посетени
+            var visitedButton = new Button
+            {
+                Text = VisitedService.IsVisited(_place.Id)
+                    ? "Премахни от посетени"
+                    : "Маркирай като посетено",
+                CornerRadius = 10,
+                BackgroundColor = Colors.SeaGreen,
+                TextColor = Colors.White
+            };
+
+            visitedButton.Clicked += async (sender, e) =>
+            {
+                if (VisitedService.IsVisited(_place.Id))
+                {
+                    VisitedService.RemoveVisited(_place);
+                    visitedButton.Text = "Маркирай като посетено";
+                    await DisplayAlert("Посетени", "Обектът е премахнат от посетени.", "OK");
+                }
+                else
+                {
+                    VisitedService.AddVisited(_place);
+                    visitedButton.Text = "Премахни от посетени";
+                    await DisplayAlert("Посетени", "Обектът е добавен като посетен.", "OK");
+                }
+            };
+
+            // 🗺️ Maps
             var mapsButton = new Button
             {
                 Text = "Отвори в Google Maps",
@@ -130,6 +159,7 @@ namespace TouristGuideBulgaria.Views
                                 factLabel,
                                 coordinatesLabel,
                                 favoriteButton,
+                                visitedButton, // 👈 новото
                                 mapsButton
                             }
                         }

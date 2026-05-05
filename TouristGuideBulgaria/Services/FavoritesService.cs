@@ -1,41 +1,66 @@
 ﻿using TouristGuideBulgaria.Models;
+using Microsoft.Maui.Storage;
 
 namespace TouristGuideBulgaria.Services
 {
     public static class FavoritesService
     {
-        private static readonly List<Place> _favorites = new();
+        private const string FavoritesKey = "favorites_ids";
+
+        private static List<int> _favoriteIds = new();
+
+        static FavoritesService()
+        {
+            LoadFavorites();
+        }
 
         public static List<Place> GetFavorites()
         {
-            return _favorites;
+            return Data.PlaceData.GetPlaces()
+                .Where(p => _favoriteIds.Contains(p.Id))
+                .ToList();
         }
 
         public static bool IsFavorite(int placeId)
         {
-            return _favorites.Any(p => p.Id == placeId);
+            return _favoriteIds.Contains(placeId);
         }
 
         public static void AddFavorite(Place place)
         {
-            if (!IsFavorite(place.Id))
+            if (!_favoriteIds.Contains(place.Id))
             {
-                place.IsFavorite = true;
-                _favorites.Add(place);
+                _favoriteIds.Add(place.Id);
+                SaveFavorites();
             }
         }
 
         public static void RemoveFavorite(Place place)
         {
-            var existingPlace = _favorites.FirstOrDefault(p => p.Id == place.Id);
-
-            if (existingPlace != null)
+            if (_favoriteIds.Contains(place.Id))
             {
-                existingPlace.IsFavorite = false;
-                _favorites.Remove(existingPlace);
+                _favoriteIds.Remove(place.Id);
+                SaveFavorites();
             }
+        }
 
-            place.IsFavorite = false;
+        private static void SaveFavorites()
+        {
+            var data = string.Join(",", _favoriteIds);
+            Preferences.Set(FavoritesKey, data);
+        }
+
+        private static void LoadFavorites()
+        {
+            var data = Preferences.Get(FavoritesKey, "");
+
+            if (string.IsNullOrWhiteSpace(data))
+                return;
+
+            _favoriteIds = data
+                .Split(',')
+                .Select(id => int.Parse(id))
+                .ToList();
         }
     }
 }
